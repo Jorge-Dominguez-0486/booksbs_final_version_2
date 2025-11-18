@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a Books BS</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2.3">
+</head>
+<body>
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+
+    <nav class="menu-sidebar">
+        <ul>
+            {% if user.is_staff %}
+                <li style="background-color: #2c3e50; border-left: 5px solid #f1c40f;">
+                    <a href="{% url 'dash_home' %}" style="color: #fff;"> Ir al Panel Admin</a>
+                </li>
+            {% endif %}
+
+            <li class="active"><a href="{% url 'index' %}">Inicio</a></li>
+            
+            <li><a href="{% url 'proximos' %}">Proximos libros</a></li>
+
+            <li class="menu-item-has-children"> <a href="{% url 'bookstore' %}">Book Store ▾</a>
+                <ul class="submenu">
+                    <li><a href="{% url 'bookstore' %}">Ver Todo</a></li>
+                    
+                    {% for genero in menu_generos %}
+                        <li>
+                            <a href="{% url 'bookstore' %}?genero_id={{ genero.id }}">
+                                {{ genero.nombre_genero }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+
+            <li><a href="{% url 'mis_libros' %}">Mis Libros</a></li>
+            <li><a href="{% url 'cuenta' %}">Mi Cuenta</a></li>
+        </ul>
+    </nav>
+    
+    <div class="page-container">
+        <header class="main-header">
+            {% if user.is_authenticated %}
+                <div class="header-user-info">
+                    <span class="user-name">Hola, {{ user.first_name|default:user.username }}</span>
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="header-logout-btn-mini">Cerrar Sesión</button>
+                    </form>
+                </div>
+            {% endif %}
+            
+            <h1>Books BS</h1>
+        </header>
+        <main class="content">
+            <section class="welcome-section">
+                <h2 class="welcome-title">Tu Biblioteca Cristiana Digital</h2>
+                <p class="welcome-subtitle">Accede a cientos de libros y audiolibros para fortalecer tu fe y conocimiento.</p>
+                <a href="{% url 'registro' %}" class="cta-button">Únete a la comunidad</a>
+            </section>
+
+            <section class="store-preview">
+                <h3 class="section-title">Novedades en la Tienda</h3>
+                <div class="horizontal-books-grid">
+                    {% for libro in libros %}
+                    <a href="{% url 'libro_detalle' libro.id %}" class="book-card"> 
+                        <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="book-card-cover">
+                        <div class="book-card-info">
+                            <h4 class="book-card-title">{{ libro.titulo }}</h4>
+                            <p class="book-card-author">
+                                {% for autor in libro.autores.all %}{{ autor.nombre_autor }}{% endfor %}
+                            </p>
+                        </div>
+                    </a>
+                    {% empty %}
+                        <p>No hay novedades en este momento. ¡Vuelve pronto!</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="genre-explorer">
+                <h3 class="section-title">Explora por Género</h3>
+                <div class="genre-grid">
+                    <a href="{% url 'bookstore' %}?genero_id=1" class="genre-chip">Teología</a>
+                    <a href="{% url 'bookstore' %}?genero_id=2" class="genre-chip">Estudio Bíblico</a>
+                    <a href="{% url 'bookstore' %}?genero_id=3" class="genre-chip">Devocionales</a>
+                    <a href="{% url 'bookstore' %}?genero_id=4" class="genre-chip">Biografías</a>
+                </div>
+            </section>
+
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <img src="{% static 'images/libro1.png' %}" alt="Libro abierto" class="benefit-icon">
+                    <p>Encuentra libros, comentarios y concordancias que te ayudarán a profundizar en el estudio de la Biblia.</p>
+                </div>
+                <div class="benefit-item">
+                    <img src="{% static 'images/libro2.jpg' %}" alt="Libros apilados" class="benefit-icon">
+                    <p>Accede a cientos de títulos desde tu dispositivo, sin preocuparte por el espacio físico.</p>
+                </div>
+                <div class="benefit-item">
+                    <img src="{% static 'images/libro3.jpg' %}" alt="Libro antiguo" class="benefit-icon">
+                    <p>Lleva tu biblioteca completa a donde quieras y continúa tu lectura en cualquier momento.</p>
+                </div>
+                <div class="benefit-item">
+                    <img src="{% static 'images/libro4.jpg' %}" alt="Libro digital" class="benefit-icon">
+                    <p>Elige tu formato: Lee eBooks o escucha Audiobooks mientras realizas tus actividades diarias.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            Dominguez Ortiz Jorge Luis 5°J | Construye Aplicaciones Web
+        </footer>
+    </div>
+</body>
+</html>

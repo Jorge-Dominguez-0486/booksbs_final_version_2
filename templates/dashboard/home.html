@@ -1,0 +1,135 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}Inicio del Panel{% endblock %}
+
+{% block contenido %}
+    <style>
+        .welcome-header {
+            background: linear-gradient(135deg, #a4bdfc, #7abaff);
+            color: #fff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .welcome-header h2 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border-bottom: none;
+        }
+        .welcome-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .quick-access-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+        .quick-access-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .quick-access-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .quick-access-card .count {
+            display: block;
+            font-size: 2.5rem;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <div class="welcome-header">
+        <h2>Bienvenido, {{ user.first_name }}</h2>
+        <p>Desde aquí puedes gestionar todos los aspectos de la Librería Digital.</p>
+    </div>
+
+    <h3>Accesos Rápidos</h3>
+    <div class="quick-access-grid">
+        <a href="{% url 'dash_ver_pedidos' %}" class="quick-access-card">
+            <span class="count">{{ num_pedidos }}</span>
+            Ver Pedidos
+        </a>
+        <a href="{% url 'dash_ver_libros' %}" class="quick-access-card">
+            <span class="count">{{ num_libros }}</span>
+            Gestionar Libros
+        </a>
+        <a href="{% url 'dash_ver_usuarios' %}" class="quick-access-card">
+            <span class="count">{{ num_usuarios }}</span>
+            Administrar Usuarios
+        </a>
+    </div>
+
+    <h3 style="margin-top: 40px;">Analíticas de la Biblioteca</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 50px;">
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h4 style="text-align: center; margin-top: 0;">Libros por Género</h4>
+            <canvas id="chartGeneros"></canvas>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h4 style="text-align: center; margin-top: 0;">Estado de Pedidos</h4>
+            <canvas id="chartPedidos"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // NOTA: VS Code marcará error en {{ ... }} pero IGNÓRALO, es sintaxis válida de Django.
+
+        // 1. Configuración de la Gráfica de Géneros (Pastel/Dona)
+        const ctxGeneros = document.getElementById('chartGeneros').getContext('2d');
+        new Chart(ctxGeneros, {
+            type: 'doughnut', 
+            data: {
+                labels: {{ labels_generos_json|safe }}, 
+                datasets: [{
+                    data: {{ data_generos_json|safe }},
+                    backgroundColor: [
+                        '#3498db', '#e74c3c', '#f1c40f', '#2ecc71', '#9b59b6', '#34495e'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // 2. Configuración de la Gráfica de Pedidos (Barras)
+        const ctxPedidos = document.getElementById('chartPedidos').getContext('2d');
+        new Chart(ctxPedidos, {
+            type: 'bar',
+            data: {
+                labels: {{ labels_pedidos_json|safe }},
+                datasets: [{
+                    label: 'Cantidad de Pedidos',
+                    data: {{ data_pedidos_json|safe }},
+                    backgroundColor: [
+                        '#2ecc71', '#f1c40f', '#e74c3c' 
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } } 
+                }
+            }
+        });
+    </script>
+{% endblock %}

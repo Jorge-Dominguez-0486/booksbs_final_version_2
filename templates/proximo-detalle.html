@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Próximamente: {{ libro.titulo }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="proximo-page">
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+    <nav class="menu-sidebar">
+        <ul>
+             {% if user.is_staff %}
+                <li style="background-color: #2c3e50; border-left: 5px solid #f1c40f;">
+                    <a href="{% url 'dash_home' %}" style="color: #fff;"> Ir al Panel Admin</a>
+                </li>
+            {% endif %}
+            <li><a href="{% url 'index' %}">Inicio</a></li>
+            <li><a href="{% url 'proximos' %}">Proximos libros</a></li>
+            <li><a href="{% url 'bookstore' %}">Book Store</a></li>
+            <li><a href="{% url 'mis_libros' %}">Mis Libros</a></li>
+            <li><a href="{% url 'cuenta' %}">Mi Cuenta</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container">
+
+        <header class="main-header">
+            {% if user.is_authenticated %}
+                <div class="header-user-info">
+                    <span class="user-name">Hola, {{ user.first_name|default:user.username }}</span>
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="header-logout-btn-mini">Cerrar Sesión</button>
+                    </form>
+                </div>
+            {% endif %}
+            <h1>Books BS</h1>
+        </header>
+
+        <main class="content">
+            
+            <div class="back-link-area">
+                <a href="{% url 'proximos' %}" class="back-link">&larr; Volver a Próximos Lanzamientos</a>
+            </div>
+            
+            <div class="book-details-layout">
+                
+                <img src="{{ libro.portada.url }}" alt="Portada {{ libro.titulo }}" class="book-cover-large">
+                
+                <div class="book-info-container">
+                    
+                    <h2 class="book-title">{{ libro.titulo }}</h2>
+                    <p class="book-author">
+                        {% for autor in libro.autores.all %}
+                            {{ autor.nombre_autor }}
+                        {% endfor %}
+                    </p>
+                    
+                    <p class="book-description">
+                        {{ libro.descripcion }}
+                    </p>
+
+                    <div class="book-meta">
+                        <p><strong>Géneros:</strong> 
+                            <span class="genre-list">
+                                {% for genero in libro.generos.all %}
+                                <a href="{% url 'bookstore' %}?genero={{ genero.id }}">{{ genero.nombre_genero }}</a>
+                                {% endfor %}
+                            </span>
+                        </p>
+                        <p><strong>Formato:</strong> <strong>{{ libro.get_formato_display }}</strong></p>
+                    </div>
+
+                    <div class="action-box">
+                        
+                        <p class="book-release-date">
+                            {% if libro.fecha_lanzamiento %}
+                                Lanzamiento: {{ libro.fecha_lanzamiento|date:"d/m/Y" }}
+                            {% else %}
+                                Próximamente
+                            {% endif %}
+                        </p>
+                        <button class="action-button disabled" disabled>No disponible aún</button>
+                    
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="main-footer">
+            Dominguez Ortiz Jorge Luis 5°J | Construye Aplicaciones Web
+        </footer>
+
+    </div>
+    
+</body>
+</html>

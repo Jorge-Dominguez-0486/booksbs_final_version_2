@@ -1,0 +1,36 @@
+{% extends 'dashboard/dashboard_base.html' %}
+{% block titulo %}Relación Libros-Autores{% endblock %}
+
+{% block contenido %}
+    <h2>Tabla Puente: Libros y Autores</h2>
+    <p>Esta tabla muestra cada conexión individual entre un libro y un autor. (Se gestiona desde "Editar Libro").</p>
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>ID Relación (PK)</th>
+                    <th>Libro (FK)</th>
+                    <th>Autor (FK)</th>
+                    <th>Acciones</th> </tr>
+            </thead>
+            <tbody>
+                {% for rel in relaciones %}
+                <tr>
+                    <td>{{ rel.id }}</td>
+                    <td>{{ rel.libro_id }} ({{ rel.libro.titulo }})</td>
+                    <td>{{ rel.autor_id }} ({{ rel.autor.nombre_autor }})</td>
+                    <td>
+                        <a href="{% url 'dash_borrar_rel_autor' rel.id %}" 
+                           class="btn-action delete"
+                           onclick="return confirm('¿Estás seguro de que quieres borrar esta relación?');">
+                           Borrar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No hay relaciones entre libros y autores.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

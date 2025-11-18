@@ -1,0 +1,53 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}Ver Autores{% endblock %}
+
+{% block contenido %}
+    <div class="header-with-action">
+        <h2>Gestión de Autores</h2>
+        <a href="{% url 'dash_agregar_autor' %}" class="btn-action save">Agregar Nuevo Autor</a>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container-dash">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>ID (PK)</th>
+                    <th>Foto</th>
+                    <th>Nombre del Autor</th>
+                    <th>Biografía</th> <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for autor in autores %}
+                <tr>
+                    <td>{{ autor.id }}</td>
+                    <td>
+                        {% if autor.foto %}
+                            <img src="{{ autor.foto.url }}" alt="Foto" class="table-portada">
+                        {% else %}
+                            (Sin foto)
+                        {% endif %}
+                    </td>
+                    <td>{{ autor.nombre_autor }}</td>
+                    <td>{{ autor.biografia|default:"--"|truncatechars:40 }}</td> <td>
+                        <a href="{% url 'dash_editar_autor' autor.id %}" class="btn-action edit">Editar</a>
+                        <a href="{% url 'dash_borrar_autor' autor.id %}" class="btn-action delete">Borrar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No se han encontrado autores.</td> </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

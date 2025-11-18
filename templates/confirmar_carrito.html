@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Pedido</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2.6"> 
+    <style>
+        .payment-option {
+            transition: all 0.3s ease; opacity: 0.6; border: 2px solid #ccc;
+        }
+        .payment-option.selected {
+            opacity: 1; border-color: #3cb9ff; background-color: #e0f7fa; transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="compra-page">
+
+    <div class="page-container">
+        <header class="main-header">
+            {% if user.is_authenticated %}
+                <div class="header-user-info">
+                    <span class="user-name">Hola, {{ user.first_name|default:user.username }}</span>
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="header-logout-btn-mini">Cerrar Sesión</button>
+                    </form>
+                </div>
+            {% endif %}
+            <h1>Confirmar y Pagar</h1>
+        </header>
+
+        <main class="content">
+            
+            <div class="content-back-link">
+                <a href="{% url 'pagina_carrito' %}">&larr; Volver al Carrito</a>
+            </div>
+
+            <div class="checkout-layout">
+                <aside class="order-summary">
+                    <h2>Resumen del Pedido</h2>
+                    
+                    <div class="items-scroll" style="max-height: 400px; overflow-y: auto;">
+                        {% for key, item in carrito.carrito.items %}
+                        <div class="order-item">
+                            <img src="{{ item.imagen }}" alt="{{ item.nombre }}" class="order-item-cover">
+                            <div class="order-item-info">
+                                <h3 class="order-item-title">{{ item.nombre }}</h3>
+                                <p class="order-item-price">${{ item.precio }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="order-total" style="border-top: 2px solid #ccc; padding-top: 20px; margin-top: 20px;">
+                        <p style="font-size: 1rem; display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>Subtotal</span>
+                            <span>${{ carrito.obtener_subtotal }}</span>
+                        </p>
+                        <p style="font-size: 1rem; display: flex; justify-content: space-between; margin-bottom: 15px;">
+                            <span>IVA (16%)</span>
+                            <span>${{ carrito.obtener_iva }}</span>
+                        </p>
+                        <p style="font-size: 1.5rem; font-weight: bold; display: flex; justify-content: space-between; color: #27ae60; border-top: 1px solid #eee; padding-top: 10px;">
+                            <span>Total Final</span>
+                            <span>${{ carrito.obtener_total_con_iva }}</span>
+                        </p>
+                    </div>
+                </aside>
+
+                <section class="payment-form">
+                    <form action="{% url 'procesar_carrito_compra' %}" method="POST" id="paymentForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="metodo_pago" id="input_metodo_pago" value="tarjeta">
+                        
+                        <div class="form-section">
+                            <h3>1. Datos del Cliente</h3>
+                            <div class="user-info">
+                                <strong>{{ user.first_name }}</strong>
+                                <span>{{ user.email }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3>2. Método de Pago</h3>
+                            <div class="payment-method">
+                                <div class="payment-option selected" onclick="seleccionarPago('tarjeta', this)">
+                                    💳 Tarjeta de Crédito/Débito
+                                </div>
+                                <div class="payment-option" onclick="seleccionarPago('paypal', this)">
+                                    🅿️ PayPal
+                                </div>
+                            </div>
+                            <p class="payment-note" id="payment-note">
+                                * Estás pagando con Tarjeta (Simulación).
+                            </p>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Finalizar Compra</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+
+        <footer class="main-footer">
+            Dominguez Ortiz Jorge Luis 5°J | Construye Aplicaciones Web
+        </footer>
+    </div>
+
+    <script>
+        function seleccionarPago(metodo, elemento) {
+            document.querySelectorAll('.payment-option').forEach(opcion => opcion.classList.remove('selected'));
+            elemento.classList.add('selected');
+            document.getElementById('input_metodo_pago').value = metodo;
+            const nota = document.getElementById('payment-note');
+            if (metodo === 'paypal') {
+                nota.innerHTML = "* Serás redirigido a PayPal para completar el pago (Simulación).";
+            } else {
+                nota.innerHTML = "* Estás pagando con Tarjeta (Simulación).";
+            }
+        }
+    </script>
+</body>
+</html>

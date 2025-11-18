@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="form-page">
+
+    <h1>Crea tu Cuenta en Books BS</h1>
+
+    <div class="form-container">
+        
+        {% if messages %}
+            <div class="messages" style="color: red; margin-bottom: 15px;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form action="{% url 'registro' %}" method="POST">
+            {% csrf_token %}
+            <div>
+                <input type="text" name="nombre_completo" placeholder="Nombre Completo" class="input-field" required>
+            </div>
+            <div>
+                <input type="email" name="email" placeholder="Correo electrónico" class="input-field" required>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Contraseña" class="input-field" required>
+            </div>
+            <div>
+                <input type="password" name="confirm_password" placeholder="Confirmar contraseña" class="input-field" required>
+            </div>
+            <button type="submit" class="submit-btn">Registrarme</button>
+        </form>
+        
+        <a href="{% url 'login' %}" class="login-link">¿Ya tienes una cuenta? Inicia sesión</a>
+    </div>
+
+</body>
+</html>

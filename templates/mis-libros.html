@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Libros</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2.0">
+</head>
+<body>
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+    <nav class="menu-sidebar">
+        <ul>
+            {% if user.is_staff %}
+                <li style="background-color: #2c3e50; border-left: 5px solid #f1c40f;">
+                    <a href="{% url 'dash_home' %}" style="color: #fff;"> Ir al Panel Admin</a>
+                </li>
+            {% endif %}
+
+            <li><a href="{% url 'index' %}">Inicio</a></li>
+            <li><a href="{% url 'proximos' %}">Proximos libros</a></li>
+
+            <li class="menu-item-has-children"> <a href="{% url 'bookstore' %}">Book Store ▾</a>
+                <ul class="submenu">
+                    <li><a href="{% url 'bookstore' %}">Ver Todo</a></li>
+                    
+                    {% for genero in menu_generos %}
+                        <li>
+                            <a href="{% url 'bookstore' %}?genero_id={{ genero.id }}">
+                                {{ genero.nombre_genero }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+
+            <li class="active"><a href="{% url 'mis_libros' %}">Mis Libros</a></li>
+            <li><a href="{% url 'cuenta' %}">Mi Cuenta</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container">
+        <header class="main-header">
+            {% if user.is_authenticated %}
+                <div class="header-user-info">
+                    <span class="user-name">Hola, {{ user.first_name|default:user.username }}</span>
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="header-logout-btn-mini">Cerrar Sesión</button>
+                    </form>
+                </div>
+            {% endif %}
+            
+            <h1>Books BS</h1>
+        </header>
+
+        <main class="content">
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <h2 class="page-title">Mi Biblioteca Personal</h2>
+
+            <section id="my-ebooks">
+                <h3 class="section-subtitle">Mis Ebooks (Para Leer)</h3>
+                <div class="my-books-grid">
+                    {% for libro in ebooks %}
+                    <a href="{% url 'leer_libro' libro.id 1 %}" class="book-item-link">
+                        <div class="book-item">
+                            <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="book-cover">
+                            <h4 class="book-title">{{ libro.titulo }}</h4>
+                            <p class="book-author">{% for autor in libro.autores.all %}{{ autor.nombre_autor }}{% endfor %}</p>
+                        </div>
+                    </a>
+                    {% empty %}
+                        <p>Aún no tienes Ebooks en tu biblioteca.</p>
+                    {% endfor %}
+                </div>
+            </section>
+            
+            <section id="my-audiobooks">
+                <h3 class="section-subtitle">Mis Audiobooks (Para Escuchar)</h3>
+                <div class="my-books-grid">
+                    {% for libro in audiobooks %}
+                    <a href="{% url 'leer_libro' libro.id 1 %}" class="book-item-link">
+                        <div class="book-item">
+                            <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="book-cover">
+                            <h4 class="book-title">{{ libro.titulo }}</h4>
+                            <p class="book-author">{% for autor in libro.autores.all %}{{ autor.nombre_autor }}{% endfor %}</p>
+                        </div>
+                    </a>
+                    {% empty %}
+                        <p>Aún no tienes Audiobooks en tu biblioteca.</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            {% if not ebooks and not audiobooks %}
+            <div class="empty-state">
+                <p>Tu biblioteca está vacía.</p>
+                <a href="{% url 'bookstore' %}" class="empty-state-button">Explora la Tienda</a>
+            </div>
+            {% endif %}
+        </main>
+        
+        <footer class="main-footer">
+            Dominguez Ortiz Jorge Luis 5°J | Construye Aplicaciones Web
+        </footer>
+    </div>
+</body>
+</html>

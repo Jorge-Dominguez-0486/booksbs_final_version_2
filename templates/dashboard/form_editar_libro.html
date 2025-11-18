@@ -1,0 +1,129 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block contenido %}
+<style>
+    .grid-layout-2-col {
+        display: grid;
+        grid-template-columns: 2fr 1fr; 
+        gap: 30px;
+    }
+    .form-card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .form-card h3 {
+        margin-top: 0;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+    .content-list {
+        list-style: none;
+        padding: 0;
+        max-height: 400px; 
+        overflow-y: auto; 
+    }
+    .content-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .btn-delete-content {
+        background-color: #e74c3c;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+    .btn-delete-content:hover {
+        background-color: #c0392b;
+    }
+</style>
+
+<h2>{{ titulo_pagina }}</h2>
+
+{% if messages %}
+<div class="messages-container-dash">
+    {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid-layout-2-col">
+    
+    <div class="form-card">
+        <h3>Información Principal</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="form_libro">
+            <div class="form-field-wrapper">
+                {{ form_libro.as_p }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-action save">Guardar Cambios del Libro</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="form-card">
+        
+        <h3>Subir Contenido (De Golpe)</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="form_contenido_bulk">
+            <div class="form-field-wrapper">
+                {{ form_contenido_bulk.as_p }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-action save" style="background-color: #e67e22;">Subir Archivos</button>
+            </div>
+        </form>
+
+        <hr style="margin: 30px 0;">
+
+        <h3>Subir Archivo Individual (Correcciones)</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="form_contenido_individual">
+            <div class="form-field-wrapper">
+                {{ form_contenido_individual.as_p }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-action save" style="background-color: #3498db;">Añadir Contenido</button>
+            </div>
+        </form>
+        
+        <hr style="margin: 30px 0;">
+
+        <h3>Contenido Existente</h3>
+        <div class="content-list-container">
+            <ul class="content-list">
+                {% for item in contenido_actual %}
+                    <li>
+                        <span>
+                            <strong>{{ item.get_tipo_contenido_display }}</strong> (Orden: {{ item.orden }})
+                            <small style="display: block;">{{ item.archivo.name|truncatechars:30 }}</small>
+                        </span>
+                        <a href="{% url 'dash_borrar_contenido' libro.id item.id %}" 
+                           class="btn-delete-content" 
+                           onclick="return confirm('¿Estás seguro de que quieres borrar este archivo?');">
+                           X
+                        </a>
+                    </li>
+                {% empty %}
+                    <li>Este libro aún no tiene contenido.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

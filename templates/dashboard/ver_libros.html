@@ -1,0 +1,81 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}Ver Libros{% endblock %}
+
+{% block contenido %}
+    <div class="header-with-action">
+        <h2>Gestión de Libros</h2>
+        <a href="{% url 'dash_agregar_libro' %}" class="btn-action save">Agregar Nuevo Libro</a>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container-dash">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>ID (PK)</th>
+                    <th>Portada</th>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Formato</th>
+                    <th>Estado</th>
+                    <th>Lanzamiento</th>
+                    <th>Duración (min)</th>
+                    <th>Géneros (Nombre e ID)</th> <th>Autores (Nombre e ID)</th> <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for libro in libros %}
+                <tr>
+                    <td>{{ libro.id }}</td>
+                    <td>
+                        {% if libro.portada %}
+                            <img src="{{ libro.portada.url }}" alt="Portada" class="table-portada">
+                        {% else %}
+                            (Sin portada)
+                        {% endif %}
+                    </td>
+                    <td>{{ libro.titulo }}</td>
+                    <td>{{ libro.descripcion|truncatechars:30 }}</td>
+                    <td>${{ libro.precio }}</td>
+                    <td>{{ libro.get_formato_display }}</td>
+                    <td>{{ libro.get_estado_publicacion_display }}</td>
+                    <td>{{ libro.fecha_lanzamiento|default:"--" }}</td>
+                    <td>{{ libro.duracion_minutos|default:"N/A" }}</td>
+                    
+                    <td>
+                        {% for gen in libro.generos.all %}
+                            {{ gen.nombre_genero }} (ID: {{ gen.id }})<br>
+                        {% empty %}
+                            Ninguno
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for autor in libro.autores.all %}
+                            {{ autor.nombre_autor }} (ID: {{ autor.id }})<br>
+                        {% empty %}
+                            Ninguno
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{% url 'dash_editar_libro' libro.id %}" class="btn-action edit">Editar</a>
+                        <a href="{% url 'dash_borrar_libro' libro.id %}" class="btn-action delete">Borrar</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="12">No se han encontrado libros.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

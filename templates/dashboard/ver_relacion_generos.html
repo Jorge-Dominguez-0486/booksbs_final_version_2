@@ -1,0 +1,36 @@
+{% extends 'dashboard/dashboard_base.html' %}
+{% block titulo %}Relación Libros-Géneros{% endblock %}
+
+{% block contenido %}
+    <h2>Tabla Puente: Libros y Géneros</h2>
+    <p>Esta tabla muestra cada conexión individual entre un libro y un género. (Se gestiona desde "Editar Libro").</p>
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>ID Relación (PK)</th>
+                    <th>Libro (FK)</th>
+                    <th>Género (FK)</th>
+                    <th>Acciones</th> </tr>
+            </thead>
+            <tbody>
+                {% for rel in relaciones %}
+                <tr>
+                    <td>{{ rel.id }}</td>
+                    <td>{{ rel.libro_id }} ({{ rel.libro.titulo }})</td>
+                    <td>{{ rel.genero_id }} ({{ rel.genero.nombre_genero }})</td>
+                    <td>
+                        <a href="{% url 'dash_borrar_rel_genero' rel.id %}" 
+                           class="btn-action delete"
+                           onclick="return confirm('¿Estás seguro de que quieres borrar esta relación?');">
+                           Borrar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4">No hay relaciones entre libros y géneros.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

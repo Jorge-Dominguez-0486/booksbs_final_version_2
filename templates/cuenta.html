@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2.3">
+</head>
+<body class="account-page">
+
+    <input type="checkbox" id="menu-toggle">
+    <label for="menu-toggle" class="menu-icon">&#9776;</label>
+    <nav class="menu-sidebar">
+        <ul>
+            {% if user.is_staff %}
+                <li style="background-color: #2c3e50; border-left: 5px solid #f1c40f;">
+                    <a href="{% url 'dash_home' %}" style="color: #fff;"> Ir al Panel Admin</a>
+                </li>
+            {% endif %}
+            
+            <li><a href="{% url 'index' %}">Inicio</a></li>
+            <li><a href="{% url 'proximos' %}">Proximos libros</a></li>
+
+            <li class="menu-item-has-children"> <a href="{% url 'bookstore' %}">Book Store ▾</a>
+                <ul class="submenu">
+                    <li><a href="{% url 'bookstore' %}">Ver Todo</a></li>
+                    
+                    {% for genero in menu_generos %}
+                        <li>
+                            <a href="{% url 'bookstore' %}?genero_id={{ genero.id }}">
+                                {{ genero.nombre_genero }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+
+            <li><a href="{% url 'mis_libros' %}">Mis Libros</a></li>
+            
+            <li class="active"><a href="{% url 'cuenta' %}">Mi Cuenta</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-container">
+        <header class="main-header">
+            {% if user.is_authenticated %}
+                <div class="header-user-info">
+                    <span class="user-name">Hola, {{ user.first_name|default:user.username }}</span>
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="header-logout-btn-mini">Cerrar Sesión</button>
+                    </form>
+                </div>
+            {% endif %}
+            
+            <h1>Books BS</h1>
+        </header>
+        
+        <main class="content">
+            <div class="profile-card">
+                <div class="profile-icon-area">
+                    <div class="icon-head"></div>
+                    <div class="icon-body"></div>
+                </div>
+
+                <div class="profile-details-area">
+                    <p>Nombre: <span class="user-data" id="user-name">{{ user.first_name }}</span></p>
+                    <p>Correo: <span class="user-data" id="user-email">{{ user.email }}</span></p>
+                    <p>Libros Adquiridos: <span class="user-data" id="user-book-count">{{ conteo_libros }}</span></p>
+
+                    <form action="{% url 'logout' %}" method="POST" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="orders-section" style="margin-top: 50px; width: 100%; max-width: 800px;">
+                <h2 class="section-title" style="margin-top: 0;">Mis Pedidos Recientes</h2>
+                
+                {% if pedidos %}
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <thead style="background-color: #a4bdfc;">
+                            <tr>
+                                <th style="padding: 15px; text-align: left;">ID</th>
+                                <th style="padding: 15px; text-align: left;">Fecha</th>
+                                <th style="padding: 15px; text-align: left;">Total</th>
+                                <th style="padding: 15px; text-align: center;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pedido in pedidos %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 15px;">#{{ pedido.id }}</td>
+                                <td style="padding: 15px;">{{ pedido.fecha_pedido|date:"d M, Y" }}</td>
+                                <td style="padding: 15px; font-weight: bold;">${{ pedido.total_pagado }}</td>
+                                <td style="padding: 15px; text-align: center;">
+                                    <a href="{% url 'descargar_factura' pedido.id %}" target="_blank" style="background-color: #e74c3c; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 0.9rem;">
+                                        📄 PDF
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                        <p>No has realizado pedidos aún.</p>
+                        <a href="{% url 'bookstore' %}" style="color: #3498db; font-weight: bold;">Ir a la tienda</a>
+                    </div>
+                {% endif %}
+            </div>
+
+        </main>
+        
+        <footer class="main-footer">
+            Dominguez Ortiz Jorge Luis 5°J | Construye Aplicaciones Web
+        </footer>
+    </div>
+</body>
+</html>

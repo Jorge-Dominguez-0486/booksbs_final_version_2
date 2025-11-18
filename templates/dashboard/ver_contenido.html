@@ -1,0 +1,50 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}Ver Contenido de Libros{% endblock %}
+
+{% block contenido %}
+    <h2>Gestión de Contenido (Páginas y Audios)</h2>
+    <p>Esta tabla muestra todos los archivos individuales (páginas JPG, audios MP3) que has subido.</p>
+
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>ID Cont.</th>
+                    <th>Libro (Nombre e ID)</th> <th>Tipo</th>
+                    <th>Orden</th>
+                    <th>Archivo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in contenido_lista %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    
+                    <td>
+                        {{ item.libro.titulo }}
+                        <br>
+                        <small style="color: #555;">(ID: {{ item.libro.id }})</small>
+                    </td>
+                    
+                    <td>{{ item.get_tipo_contenido_display }}</td>
+                    <td>{{ item.orden }}</td>
+                    <td>{{ item.archivo.name|truncatechars:40 }}</td>
+                    <td>
+                        <a href="{% url 'dash_borrar_contenido' item.libro.id item.id %}" 
+                           class="btn-action delete"
+                           onclick="return confirm('¿Estás seguro de que quieres borrar este archivo?');">
+                            Borrar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No se ha encontrado contenido.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

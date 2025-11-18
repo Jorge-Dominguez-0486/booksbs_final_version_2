@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books BS - Iniciar Sesión</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="form-page">
+
+    <h1>Bienvenido a Books BS</h1>
+
+    <div class="form-container">
+        <h2>Inicia sesión</h2>
+
+        {% if messages %}
+            <div class="messages" style="color: red; margin-bottom: 15px;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form action="{% url 'login' %}" method="POST">
+            {% csrf_token %}
+            <div>
+                <input type="email" name="email" placeholder="Correo electrónico" class="input-field" required>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Contraseña" class="input-field" required>
+            </div>
+            <button type="submit" class="submit-btn">INICIAR</button>
+        </form>
+        <a href="{% url 'registro' %}" class="register-link">¿No tienes cuenta? Regístrate</a>
+    </div>
+
+</body>
+</html>

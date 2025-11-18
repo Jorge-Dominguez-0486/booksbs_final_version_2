@@ -1,0 +1,20 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block contenido %}
+    <h2>{{ titulo_pagina }}</h2>
+
+    <div class="form-container-dashboard confirmation">
+        <p>¿Estás seguro de que quieres eliminar permanentemente <strong>"{{ objeto }}"</strong>?</p>
+        <p class="warning">¡Esta acción no se puede deshacer!</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn-action delete">Sí, Eliminar</button>
+                <a href="{% url url_cancelar %}" class="btn-action edit">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

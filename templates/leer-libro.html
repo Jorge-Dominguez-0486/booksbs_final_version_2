@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leyendo: {{ libro.titulo }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2.3">
+</head>
+<body class="reader-page">
+
+    <div class="reader-container">
+
+        <nav class="reader-nav">
+            <a href="{% url 'mis_libros' %}" class="nav-back-arrow">&larr;</a>
+            <h2 class="nav-book-title">{{ libro.titulo }}</h2>
+        </nav>
+
+        <main class="book-content">
+            
+            {% if libro.formato == 'ebook' %}
+                <div class="ebook-reader">
+                    
+                    {% if pagina_actual %}
+                        <img src="{{ pagina_actual.archivo.url }}" alt="Página {{ pagina_num }} de {{ libro.titulo }}" class="book-page-img">
+
+                        <div class="ebook-navigation">
+                            {% if pagina_num > 1 %}
+                                <a class="nav-button" href="{% url 'leer_libro' libro.id pagina_num|add:'-1' %}">Anterior</a>
+                            {% else %}
+                                <button class="nav-button" disabled>Anterior</button>
+                            {% endif %}
+
+                            <span class="page-counter">Página {{ pagina_num }} de {{ total_paginas }}</span>
+
+                            {% if pagina_num < total_paginas %}
+                                <a class="nav-button" href="{% url 'leer_libro' libro.id pagina_num|add:'1' %}">Siguiente</a>
+                            {% else %}
+                                <button class="nav-button" disabled>Siguiente</button>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p>Este libro no tiene contenido (páginas) asignado todavía.</p>
+                    {% endif %}
+                </div>
+            
+            {% elif libro.formato == 'audiobook' %}
+                <div class="audiobook-player">
+                    <img src="{{ libro.portada.url }}" alt="{{ libro.titulo }}" class="audiobook-cover">
+                    
+                    {% if pista_audio %}
+                        <audio controls class="audio-player-controls">
+                           <source src="{% url 'servir_audio' pista_audio.id %}" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    {% else %}
+                        <p>Este libro no tiene contenido (audio) asignado todavía.</p>
+                    {% endif %}
+
+                </div>
+            {% endif %}
+
+        </main>
+
+    </div>
+    
+</body>
+</html>

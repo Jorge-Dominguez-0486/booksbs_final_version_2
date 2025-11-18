@@ -1,0 +1,70 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block contenido %}
+<style>
+    .grid-layout-2-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+        gap: 30px;
+    }
+    .form-card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .form-card h3 {
+        margin-top: 0;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 10px;
+    }
+</style>
+
+<h2>{{ titulo_pagina }}</h2>
+
+{% if messages %}
+<div class="messages-container-dash">
+    {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid-layout-2-col">
+
+    <div class="form-card">
+        <h3>Información Principal</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="form_info">
+
+            <div class="form-field-wrapper">
+                {{ form_info.as_p }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-action save">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="form-card">
+        <h3>Cambiar Contraseña</h3>
+        <p>Escribe la nueva contraseña dos veces. El usuario será notificado (si tuvieras emails configurados).</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="form_pass">
+
+            <div class="form-field-wrapper">
+                {{ form_pass.as_p }}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-action edit">Establecer Nueva Contraseña</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

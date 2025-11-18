@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Panel de Administración{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2.8"> 
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=2.8">
+    
+    <style>
+        /* Estilos para el botón ACTIVO en el Dashboard */
+        .sidebar-nav li a.active {
+            background-color: #3498db; /* Azul brillante */
+            border-left: 5px solid #fff;
+            color: white;
+        }
+        
+        /* Ajuste para que el footer se quede abajo */
+        .dashboard-main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content-wrapper {
+            flex: 1; 
+        }
+        
+        /* Footer específico del dashboard */
+        .dashboard-footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            border-top: 1px solid #ecf0f1;
+            background-color: #fff;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Estilo para el botón logout del dashboard */
+        .user-info-widget {
+            text-align: right;
+        }
+        .user-info-widget .user-name-dash {
+            font-size: 1rem;
+            color: #555;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .dash-logout-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .dash-logout-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <h3>Panel de Control</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li>
+                        <a href="{% url 'dash_home' %}" class="{% if request.resolver_match.url_name == 'dash_home' %}active{% endif %}">
+                             Inicio
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_pedidos' %}" class="{% if 'pedidos' in request.resolver_match.url_name or 'pedido' in request.resolver_match.url_name %}active{% endif %}">
+                            Pedidos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_libros' %}" class="{% if 'libros' in request.resolver_match.url_name or 'libro' in request.resolver_match.url_name %}active{% endif %}">
+                            Libros
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_contenido' %}" class="{% if 'contenido' in request.resolver_match.url_name %}active{% endif %}">
+                            Contenido (Págs/Audio)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_rel_generos' %}" class="{% if 'rel_generos' in request.resolver_match.url_name or 'rel_genero' in request.resolver_match.url_name %}active{% endif %}">
+                            Relación: Libros-Géneros
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_rel_autores' %}" class="{% if 'rel_autores' in request.resolver_match.url_name or 'rel_autor' in request.resolver_match.url_name %}active{% endif %}">
+                            Relación: Libros-Autores
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_usuarios' %}" class="{% if 'usuarios' in request.resolver_match.url_name or 'usuario' in request.resolver_match.url_name %}active{% endif %}">
+                            Usuarios
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_generos' %}" class="{% if 'genero' in request.resolver_match.url_name and 'rel_' not in request.resolver_match.url_name %}active{% endif %}">
+                            Géneros
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dash_ver_autores' %}" class="{% if 'autor' in request.resolver_match.url_name and 'rel_' not in request.resolver_match.url_name %}active{% endif %}">
+                            Autores
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="{% url 'index' %}" class="nav-external">Salir al Sitio ➜</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="dashboard-main-content">
+            <header class="dashboard-header">
+                <form method="GET" class="search-form">
+                    <input type="search" name="q" placeholder="Buscar en esta sección..." value="{{ query_search|default:'' }}">
+                    <button type="submit">Buscar</button>
+                </form>
+
+                <div class="user-info-widget">
+                    <span class="user-name-dash">Hola, <strong>{{ user.first_name|default:user.username }}</strong></span>
+                    <form action="{% url 'logout' %}" method="POST" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="dash-logout-btn">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </header>
+            
+            <div class="content-wrapper">
+                {% block contenido %}
+                <h2>Bienvenido al Panel</h2>
+                <p>Selecciona una opción del menú de la izquierda para comenzar.</p>
+                {% endblock %}
+            </div>
+
+            <footer class="dashboard-footer">
+                Dominguez Ortiz Jorge Luis 5°J | Construye Aplicaciones Web
+            </footer>
+        </main>
+    </div>
+
+</body>
+</html>

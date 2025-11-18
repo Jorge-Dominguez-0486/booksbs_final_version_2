@@ -1,0 +1,30 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}{{ titulo_pagina }}{% endblock %}
+
+{% block contenido %}
+    <h2>{{ titulo_pagina }}</h2>
+
+    {% if messages %}
+        <div class="messages-container-dash">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-container-dashboard">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-field-wrapper">
+                {{ form.as_p }}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-action save">Guardar Cambios</button>
+                <a href="javascript:history.back()" class="btn-action delete">Cancelar</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

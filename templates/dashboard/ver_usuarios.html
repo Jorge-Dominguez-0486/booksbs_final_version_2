@@ -1,0 +1,54 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}Ver Usuarios{% endblock %}
+
+{% block contenido %}
+    <div class="header-with-action">
+        <h2>Gestión de Usuarios</h2>
+        <a href="{% url 'dash_agregar_usuario' %}" class="btn-action save">Agregar Nuevo Usuario</a>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container-dash">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="table-container">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email (Username)</th>
+                    <th>Nombre</th>
+                    <th>Staff (Admin Básico)</th>
+                    <th>Superusuario (Admin Total)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>{{ usuario.id }}</td>
+                    <td>{{ usuario.email }}</td>
+                    <td>{{ usuario.first_name }}</td>
+                    <td>{% if usuario.is_staff %}Sí{% else %}No{% endif %}</td>
+                    <td>{% if usuario.is_superuser %}Sí{% else %}No{% endif %}</td>
+                    <td>
+                        <a href="{% url 'dash_editar_usuario' usuario.id %}" class="btn-action edit">Editar</a>
+                        {% if not usuario.is_superuser %}
+                        <a href="{% url 'dash_borrar_usuario' usuario.id %}" class="btn-action delete">Borrar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No se han encontrado usuarios.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

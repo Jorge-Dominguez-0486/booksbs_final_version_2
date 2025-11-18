@@ -1,0 +1,49 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block titulo %}Ver Pedidos{% endblock %}
+
+{% block contenido %}
+<h2>Todos los Pedidos</h2>
+
+<div class="table-container">
+    <table class="dashboard-table">
+        <thead>
+            <tr>
+                <th>ID Pedido (PK)</th>
+                <th>Usuario (Nombre e ID)</th> <th>Usuario (Email)</th>
+                <th>Fecha</th>
+                <th>Total Pagado</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>{{ pedido.id }}</td>
+                
+                <td>
+                    {{ pedido.usuario.first_name|default:"(Sin nombre)" }}
+                    <br>
+                    <small style="color: #555;">(ID: {{ pedido.usuario.id }})</small>
+                </td>
+                
+                <td>{{ pedido.usuario.email }}</td>
+                <td>{{ pedido.fecha_pedido|date:"d M, Y - H:i" }}</td>
+                <td>${{ pedido.total_pagado }}</td>
+                <td><span class="status-{{ pedido.estado_pago }}">{{ pedido.get_estado_pago_display }}</span></td>
+                <td>
+                    <a href="{% url 'dash_editar_pedido' pedido.id %}" class="btn-action edit">
+                        Editar Estado
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No se han encontrado pedidos.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
